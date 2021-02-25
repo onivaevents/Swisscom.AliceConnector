@@ -1,0 +1,13 @@
+Swisscom:
+  AliceConnector:
+    fakerProviders:
+      collection:
+        provider: Swisscom\AliceConnector\Provider\CollectionFakerProvider
+      resource:
+        provider: Swisscom\AliceConnector\Provider\ResourceFakerProvider
+        options:
+          fixturePath: 'resource://Swisscom.AliceConnector/Private/Fixture/Resource/'
+      security:
+        provider: Swisscom\AliceConnector\Provider\SecurityFakerProvider
+    fixtureSets:
+      default: '%FLOW_PATH_PACKAGES%/Application/Your.Package/Tests/Fixtures/{name}.yaml'
