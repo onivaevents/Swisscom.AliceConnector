@@ -2,7 +2,7 @@
 
 Neos Flow package for expressive fixture generation based on [Alice](https://github.com/nelmio/alice).
 
-The Swisscom.AliceConnector simply provides a Context that connects your test cases with Alice.
+The Swisscom.AliceConnector simply provides a Context that connects your functional test cases with Alice.
 
 ## Getting started
 
@@ -20,13 +20,22 @@ Set the path to your fixture files in the ``Settings.yaml``:
 Swisscom:
   AliceConnector:
     fixtureSets:
-      default: '%FLOW_PATH_PACKAGES%/Application/Your.Package/Tests/Fixtures/{name}.yaml'
+      default: '%FLOW_PATH_PACKAGES%Application/Your.Package/Tests/Fixtures/{name}.yaml'
 ```
 
 ### Fixture creation
 
 Create your file based Alice fixtures under the path defined in ```fixtureSets```. 
-See examples and documentation reference about the notation in [here](#What does Alice?).
+
+This basic example stored as ``Company.yaml`` defines a single fixture object for the domain model ``Company``:
+
+```yaml
+Your\Package\Domain\Model\Company:
+  company1:
+    name: 'Swisscom'
+```
+
+For a more real case example and documentation reference about the notation go to "[What does Alice?](#What does Alice?)".
 
 ### Usage
 
@@ -38,12 +47,9 @@ namespace Your\Package\Tests\Functional;
 
 use Swisscom\AliceConnector\Context;
 use Neos\Flow\Tests\FunctionalTestCase;
-use Your\Package\Domain\Repository\CompanyRepository;
 
 class CompanyTest extends FunctionalTestCase
 {
-
-    protected static $testablePersistenceEnabled = true;
 
     /**
      * @var Context
@@ -53,7 +59,7 @@ class CompanyTest extends FunctionalTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->fixtureContext = new Context($this->objectManager);
+        $this->fixtureContext = new Context($this->objectManager, $this::$testablePersistenceEnabled);
     }
     
     /**
@@ -61,18 +67,18 @@ class CompanyTest extends FunctionalTestCase
      */
     public function companyTest()
     {
-        $this->fixtureContext->loadFixture('Company');
-        
-        $companyRepository = $this->objectManager->get(CompanyRepository::class);
-        $company = $companyRepository->findOneByName('Swisscom');
+        $fixtures = $this->fixtureContext->loadFixture('Company');
+        $company = $fixtures['company1'];
         self::assertSame('Swisscom', $company->getName());
     }
 }
 ```
 
-If you want to work without persistence, you still can get the objects directly:
+If you have persistence enabled, you could also query the fixture through your repository:
+
 ```php
-$objectSet = $this->fixtureContext->getFixtureObjectSet('Company');
+$companyRepository = $this->objectManager->get(CompanyRepository::class);
+$company = $companyRepository->findOneByName('Swisscom');
 ```
 
 This example loads the fixture defined in ```%FLOW_PATH_PACKAGES%/Application/Your.Package/Tests/Fixtures/Company.yaml'```
@@ -84,15 +90,7 @@ This example loads the fixture defined in ```%FLOW_PATH_PACKAGES%/Application/Yo
 Alice allows you to define expressive fixtures based on YAML, JSON or PHP files. 
 Alice again is relying on [Faker](https://github.com/FakerPHP/Faker) to create fake data for your fixtures.
 
-This basic example defines a single fixture object for the domain model ``Company`` with a static name:
-
-```yaml
-Your\Package\Domain\Model\Company:
-  swisscom:
-    name: 'Swisscom'
-```
-
-The following more complex sample shows you the real gain creating 10 random ``Person`` entities with account and related entities:
+The following sample shows you the real gain of Alice creating 10 random ``Person`` entities with account and related entities:
 ```yaml
 Neos\Flow\Security\Account:
   account{1..10}:

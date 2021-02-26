@@ -18,7 +18,7 @@ class Context
     /**
      * @var NativeLoader
      */
-    public $fixtureLoader;
+    protected $loader;
 
     /**
      * @var Faker
@@ -36,20 +36,28 @@ class Context
     protected $settings;
 
     /**
+     * @var bool
+     */
+    protected $persistenceEnabled;
+
+    /**
      * Constructor to set up the fixture context
      *
      * @param ObjectManagerInterface $objectManager Object manager for constructor injection
+     * @param bool $persistenceEnabled Flag to enable persistence of objects
      */
-    public function __construct(ObjectManagerInterface $objectManager)
+    public function __construct(ObjectManagerInterface $objectManager, bool $persistenceEnabled = false)
     {
+        $this->persistenceEnabled = $persistenceEnabled;
+
         $this->persistenceManager = $objectManager->get(PersistenceManagerInterface::class);
         $configurationManager = $objectManager->get(ConfigurationManager::class);
         $fakerProviderFactory = $objectManager->get(FakerProviderFactory::class);
 
         $this->settings = $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'Swisscom.AliceConnector');
 
-        $this->fixtureLoader = new NativeLoader();
-        $this->faker = $this->fixtureLoader->getFakerGenerator();
+        $this->loader = new NativeLoader();
+        $this->faker = $this->loader->getFakerGenerator();
 
         foreach ($this->settings['fakerProviders'] as $fakerProviderSetting) {
             $options = $fakerProviderSetting['options'] ?? [];
@@ -69,36 +77,37 @@ class Context
     }
 
     /**
-     * Load the fixture objects and persist them through the persistence manager
+     * Load the fixture objects and persist them through the persistence manager if enabled.
      *
      * @param string $fixtureName Name of the fixture to be loaded (Filename without extension)
      * @param string $fixtureSet Fixture set name. See the config to define different fixture sets.
+     * @param array $parameters Alice fixture parameters
+     * @return array The loaded objects with object ID as key
+     * @throws Exception
      */
-    public function loadFixture(string $fixtureName, string $fixtureSet = 'default'): void
+    public function loadFixture(string $fixtureName, string $fixtureSet = 'default', array $parameters = []): array
     {
-        $objects = $this->getFixtureObjectSet($fixtureName, $fixtureSet);
-        $this->persist($objects);
+        $objectSet = $this->getFixtureObjectSet($fixtureName, $fixtureSet, $parameters);
+
+        if ($this->persistenceEnabled) {
+            $this->persist($objectSet);
+        }
+
+        return $objectSet->getObjects();
     }
 
-    /**
-     * Load and return the fixtures without persisting
-     *
-     * @param string $fixtureName Name of the fixture to be loaded (Filename without extension)
-     * @param string $fixtureSet Fixture set name. See the config to define different fixture sets.
-     * @return ObjectSet
-     */
-    public function getFixtureObjectSet(string $fixtureName, string $fixtureSet = 'default'): ObjectSet
+    protected function getFixtureObjectSet(string $fixtureName, string $fixtureSet, array $parameters): ObjectSet
     {
-        if (!isset($this->settings[$fixtureSet])) {
+        if (!isset($this->settings['fixtureSets'][$fixtureSet])) {
             throw new Exception(sprintf('No fixture set with name "%s" available.', $fixtureSet), 1614235658);
         }
 
-        $path = str_replace($this->settings[$fixtureSet], '{name}', $fixtureName);
+        $path = str_replace('{name}', $fixtureName, $this->settings['fixtureSets'][$fixtureSet]);
         if (!($realPath = realpath($path))) {
-            throw new Exception(sprintf('No fixture found with path "%s".', $realPath), 1614235946);
+            throw new Exception(sprintf('No fixture found with path "%s".', $path), 1614235946);
         }
 
-        return $this->fixtureLoader->loadFile($realPath);
+        return $this->loader->loadFile($realPath, $parameters);
     }
 
     private function persist(ObjectSet $objects)
