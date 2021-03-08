@@ -61,6 +61,7 @@ class Context
 
         foreach ($this->settings['fakerProviders'] as $fakerProviderSetting) {
             $options = $fakerProviderSetting['options'] ?? [];
+            $options['persistenceEnabled'] = $persistenceEnabled;
             $provider = $fakerProviderFactory->create($fakerProviderSetting['provider'], $options);
             $this->faker->addProvider($provider);
         }

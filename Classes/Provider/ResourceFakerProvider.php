@@ -35,40 +35,50 @@ class ResourceFakerProvider implements FakerProviderInterface
      * A persistent resource
      *
      * @param string $fileName
-     * @return PersistentResource
+     * @return PersistentResource|null
      */
-    public function persistentResource(string $fileName): PersistentResource
+    public function persistentResource(string $fileName): ?PersistentResource
     {
-        return $this->resourceManager->importResource($this->options['fixturePath'] . $fileName);
+        if ($this->options['persistenceEnabled'] === true) {
+            return $this->resourceManager->importResource($this->options['fixturePath'] . $fileName);
+        } else {
+            return null;
+        }
     }
 
     /**
      * Document asset with reference to a persistent resource.
      *
      * @param string $fileName
-     * @return Document
+     * @return Document|null
      */
-    public function persistentResourceDocument(string $fileName): Document
+    public function persistentResourceDocument(string $fileName): ?Document
     {
-        $resource = $this->persistentResource($fileName);
-        $image = new Document($resource);
-        $image->setTitle($fileName);
+        if ($resource = $this->persistentResource($fileName)) {
+            $image = new Document($resource);
+            $image->setTitle($fileName);
 
-        return $image;
+            return $image;
+        }
+
+        return null;
     }
 
     /**
      * Image asset with reference to a persistent resource.
      *
      * @param string $fileName
-     * @return Image
+     * @return Image|null
      */
-    public function persistentResourceImage(string $fileName): Image
+    public function persistentResourceImage(string $fileName): ?Image
     {
-        $resource = $this->persistentResource($fileName);
-        $image = new Image($resource);
-        $image->setTitle($fileName);
+        if ($resource = $this->persistentResource($fileName)) {
+            $image = new Image($resource);
+            $image->setTitle($fileName);
 
-        return $image;
+            return $image;
+        }
+
+        return null;
     }
 }
