@@ -173,3 +173,9 @@ Role object for the identifier:
 ```php
 $image = $faker->role('Your.Package:User');
 ```
+
+## Notes
+
+- Context and providers are all stored inside the ``Classes`` folder to make them available not only for test cases. 
+  Possible use cases are fixture generation on demo environments or even master data imports on prod environments.
+  
