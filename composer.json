@@ -2,6 +2,7 @@
   "description": "Neos Flow package for expressive fixture generation based on alice",
   "type": "neos-package",
   "name": "swisscom/aliceconnector",
+  "license": "MIT",
   "require": {
     "neos/flow": "^4.0 || ^5.0",
     "nelmio/alice": "^3.5"
