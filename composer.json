@@ -1,20 +1,30 @@
 {
-  "description": "Neos Flow package for expressive fixture generation based on alice",
-  "type": "neos-package",
-  "name": "swisscom/aliceconnector",
-  "license": "MIT",
-  "require": {
-    "neos/flow": "^4.0 || ^5.0",
-    "nelmio/alice": "^3.5"
-  },
-  "autoload": {
-    "psr-4": {
-      "Swisscom\\AliceConnector\\": "Classes/"
+    "description": "Neos Flow package for expressive fixture generation based on alice",
+    "type": "neos-package",
+    "name": "swisscom/aliceconnector",
+    "license": "MIT",
+    "require": {
+        "neos/flow": "^4.0 || ^5.0 || ^6.0 || ^7.0",
+        "nelmio/alice": "^3.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Swisscom\\AliceConnector\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Swisscom.AliceConnector"
+        },
+        "applied-flow-migrations": [
+            "Neos.Flow-20180415105700",
+            "Neos.Flow-20190425144900",
+            "Neos.Flow-20190515215000",
+            "Neos.Flow-20200813181400",
+            "Neos.Flow-20201003165200",
+            "Neos.Flow-20201109224100",
+            "Neos.Flow-20201205172733",
+            "Neos.Flow-20201207104500"
+        ]
     }
-  },
-  "extra": {
-    "neos": {
-      "package-key": "Swisscom.AliceConnector"
-    }
-  }
 }

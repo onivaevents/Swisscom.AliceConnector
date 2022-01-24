@@ -56,7 +56,7 @@ class CompanyTest extends FunctionalTestCase
      */
     protected $fixtureContext;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->fixtureContext = new Context($this->objectManager, $this::$testablePersistenceEnabled);
