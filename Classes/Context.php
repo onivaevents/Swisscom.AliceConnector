@@ -111,7 +111,7 @@ class Context
         return $this->loader->loadFile($realPath, $parameters);
     }
 
-    private function persist(ObjectSet $objects)
+    protected function persist(ObjectSet $objects)
     {
         foreach ($objects->getObjects() as $object) {
             if ($this->persistenceManager->isNewObject($object)) {
