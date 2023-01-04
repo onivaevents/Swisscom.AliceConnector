@@ -183,4 +183,4 @@ $image = $faker->role('Your.Package:User');
 
 - Context and providers are all stored inside the ``Classes`` folder to make them available not only for test cases. 
   Possible use cases are fixture generation on demo environments or even master data imports on prod environments.
-  
+- For reference data import see the [Swisscom.ReferenceDataImport](https://github.com/swisscomeventandmedia/Swisscom.ReferenceDataImport) implementation which is based on this package.
