@@ -162,6 +162,11 @@ Document asset with reference to a persistent resource:
 $document = $faker->persistentResourceDocument('Dummy.pdf');
 ```
 
+Content string from a resourcee:
+```php
+$string = $faker->fileContent('Dummy.txt');
+```
+
 #### Security
 
 Password hash for the given password:
