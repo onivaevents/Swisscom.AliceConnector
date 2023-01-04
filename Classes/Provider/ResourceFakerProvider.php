@@ -39,8 +39,12 @@ class ResourceFakerProvider implements FakerProviderInterface
      */
     public function persistentResource(string $fileName): ?PersistentResource
     {
+        if (substr($fileName, 0, 11) !== 'resource://') {
+            $fileName = $this->options['fixturePath'] . $fileName;
+        }
+
         if ($this->options['persistenceEnabled'] === true) {
-            return $this->resourceManager->importResource($this->options['fixturePath'] . $fileName);
+            return $this->resourceManager->importResource($fileName);
         } else {
             return null;
         }
@@ -80,5 +84,18 @@ class ResourceFakerProvider implements FakerProviderInterface
         }
 
         return null;
+    }
+
+    /**
+     * Content string from a resource.
+     *
+     * @param string $fileName
+     * @return string|null
+     */
+    public function fileContent(string $fileName): ?string
+    {
+        $value = file_get_contents($fileName);
+
+        return is_string($value) ? $value : null;
     }
 }
