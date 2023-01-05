@@ -10,4 +10,5 @@ Swisscom:
       security:
         provider: Swisscom\AliceConnector\Provider\SecurityFakerProvider
     fixtureSets:
-      default: '%FLOW_PATH_PACKAGES%Application/Your.Package/Tests/Fixtures/{name}.yaml'
+      default:
+        0: '%FLOW_PATH_PACKAGES%Application/Your.Package/Tests/Fixtures/{name}.yaml'

@@ -5,7 +5,6 @@ namespace Swisscom\AliceConnector;
 
 use Faker\Generator as Faker;
 use Nelmio\Alice\Loader\NativeLoader;
-use Nelmio\Alice\ObjectSet;
 use Neos\Flow\Configuration\ConfigurationManager;
 use Neos\Flow\ObjectManagement\ObjectManagerInterface;
 use Neos\Flow\Persistence\PersistenceManagerInterface;
@@ -88,32 +87,47 @@ class Context
      */
     public function loadFixture(string $fixtureName, string $fixtureSet = 'default', array $parameters = []): array
     {
-        $objectSet = $this->getFixtureObjectSet($fixtureName, $fixtureSet, $parameters);
+        $objects = $this->getFixtureObjects($fixtureName, $fixtureSet, $parameters);
 
         if ($this->persistenceEnabled) {
-            $this->persist($objectSet);
+            $this->persist($objects);
         }
 
-        return $objectSet->getObjects();
+        return $objects;
     }
 
-    protected function getFixtureObjectSet(string $fixtureName, string $fixtureSet, array $parameters): ObjectSet
+    protected function getFixtureObjects(string $fixtureName, string $fixtureSet, array $parameters): array
     {
+        $objects = [];
         if (!isset($this->settings['fixtureSets'][$fixtureSet])) {
             throw new Exception(sprintf('No fixture set with name "%s" available.', $fixtureSet), 1614235658);
         }
 
-        $path = str_replace('{name}', $fixtureName, $this->settings['fixtureSets'][$fixtureSet]);
-        if (!($realPath = realpath($path))) {
-            throw new Exception(sprintf('No fixture found with path "%s".', $path), 1614235946);
+        $paths = str_replace('{name}', $fixtureName, $this->settings['fixtureSets'][$fixtureSet]);
+
+        if (is_string($paths)) {
+            $paths = [$paths];
+        } elseif (!is_array($paths)) {
+            throw new Exception(
+                sprintf('The fixture set "%s" should be specified as string or array.', $fixtureSet),
+                1672842526
+            );
         }
 
-        return $this->loader->loadFile($realPath, $parameters);
+        $realPaths = array_filter(array_map(fn(string $path) => realpath($path), $paths));
+        if (!$realPaths) {
+            throw new Exception(sprintf('No fixture found with name "%s".', $fixtureSet), 1614235946);
+        }
+        foreach ($realPaths as $realPath) {
+            $objects = array_merge($objects, $this->loader->loadFile($realPath, $parameters)->getObjects());
+        }
+
+        return $objects;
     }
 
-    protected function persist(ObjectSet $objects)
+    private function persist(array $objects): void
     {
-        foreach ($objects->getObjects() as $object) {
+        foreach ($objects as $object) {
             if ($this->persistenceManager->isNewObject($object)) {
                 $this->persistenceManager->add($object);
             } else {
