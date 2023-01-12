@@ -5,7 +5,4 @@ namespace Swisscom\AliceConnector\Provider;
 
 interface FakerProviderInterface
 {
-
-    public function setOptions(array $options): void;
-
 }

@@ -61,7 +61,7 @@ class Context
         foreach ($this->settings['fakerProviders'] as $fakerProviderSetting) {
             $options = $fakerProviderSetting['options'] ?? [];
             $options['persistenceEnabled'] = $persistenceEnabled;
-            $provider = $fakerProviderFactory->create($fakerProviderSetting['provider'], $options);
+            $provider = $fakerProviderFactory->create($fakerProviderSetting['provider'], $this->faker, $options);
             $this->faker->addProvider($provider);
         }
     }
@@ -85,9 +85,9 @@ class Context
      * @return array The loaded objects with object ID as key
      * @throws Exception
      */
-    public function loadFixture(string $fixtureName, string $fixtureSet = 'default', array $parameters = []): array
+    public function loadFixture(string $fixtureName, string $fixtureSet = 'default', array $parameters = [], array $objects = []): array
     {
-        $objects = $this->getFixtureObjects($fixtureName, $fixtureSet, $parameters);
+        $objects = $this->getFixtureObjects($fixtureName, $fixtureSet, $parameters, $objects);
 
         if ($this->persistenceEnabled) {
             $this->persist($objects);
@@ -96,9 +96,8 @@ class Context
         return $objects;
     }
 
-    protected function getFixtureObjects(string $fixtureName, string $fixtureSet, array $parameters): array
+    protected function getFixtureObjects(string $fixtureName, string $fixtureSet, array $parameters, array $objects = []): array
     {
-        $objects = [];
         if (!isset($this->settings['fixtureSets'][$fixtureSet])) {
             throw new Exception(sprintf('No fixture set with name "%s" available.', $fixtureSet), 1614235658);
         }

@@ -9,16 +9,10 @@ use Neos\Flow\Security\Policy\PolicyService;
 use Neos\Flow\Security\Policy\Role;
 
 /**
- * @Flow\Scope("singleton")
+ * @Flow\Scope("prototype")
  */
 class SecurityFakerProvider implements FakerProviderInterface
 {
-
-    /**
-     * @var array
-     */
-    protected array $options;
-
     /**
      * @Flow\Inject
      * @var PolicyService
@@ -30,11 +24,6 @@ class SecurityFakerProvider implements FakerProviderInterface
      * @var HashService
      */
     protected $hashService;
-
-    public function setOptions(array $options): void
-    {
-        $this->options = $options;
-    }
 
     /**
      * Password hash for the given password

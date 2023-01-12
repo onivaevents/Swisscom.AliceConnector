@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Swisscom\AliceConnector\Provider;
 
+use Faker\Generator;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ResourceManagement\PersistentResource;
 use Neos\Flow\ResourceManagement\ResourceManager;
@@ -10,13 +11,13 @@ use Neos\Media\Domain\Model\Document;
 use Neos\Media\Domain\Model\Image;
 
 /**
- * @Flow\Scope("singleton")
+ * @Flow\Scope("prototype")
  */
 class ResourceFakerProvider implements FakerProviderInterface
 {
 
     /**
-     * @var array
+     * @var array{fixturePath: string, persistenceEnabled: bool}
      */
     protected array $options;
 
@@ -26,7 +27,7 @@ class ResourceFakerProvider implements FakerProviderInterface
      */
     protected $resourceManager;
 
-    public function setOptions(array $options): void
+    public function __construct(Generator $generator, array $options)
     {
         $this->options = $options;
     }
