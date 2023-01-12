@@ -45,7 +45,7 @@ class Context
      * @param ObjectManagerInterface $objectManager Object manager for constructor injection
      * @param bool $persistenceEnabled Flag to enable persistence of objects
      */
-    public function __construct(ObjectManagerInterface $objectManager, bool $persistenceEnabled = false)
+    public function __construct(ObjectManagerInterface $objectManager, bool $persistenceEnabled = false, ?NativeLoader $loader = null)
     {
         $this->persistenceEnabled = $persistenceEnabled;
 
@@ -55,7 +55,7 @@ class Context
 
         $this->settings = $configurationManager->getConfiguration(ConfigurationManager::CONFIGURATION_TYPE_SETTINGS, 'Swisscom.AliceConnector');
 
-        $this->loader = new NativeLoader();
+        $this->loader = $loader ?: new NativeLoader();
         $this->faker = $this->loader->getFakerGenerator();
 
         foreach ($this->settings['fakerProviders'] as $fakerProviderSetting) {
