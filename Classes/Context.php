@@ -116,16 +116,16 @@ class Context
 
         $realPaths = array_filter(array_map(fn(string $path) => realpath($path), $paths));
         if (!$realPaths) {
-            throw new Exception(sprintf('No fixture found with name "%s".', $fixtureSet), 1614235946);
+            throw new Exception(sprintf('No fixture found with name "%s" in path "%s".', $fixtureName, implode(';', $paths)), 1614235946);
         }
         foreach ($realPaths as $realPath) {
-            $objects = array_merge($objects, $this->loader->loadFile($realPath, $parameters)->getObjects());
+            $objects = $this->loader->loadFile($realPath, $parameters, $objects)->getObjects();
         }
 
         return $objects;
     }
 
-    private function persist(array $objects): void
+    protected function persist(array $objects): void
     {
         foreach ($objects as $object) {
             if ($this->persistenceManager->isNewObject($object)) {
