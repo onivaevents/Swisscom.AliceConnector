@@ -36,15 +36,16 @@ class ResourceFakerProvider implements FakerProviderInterface
      * A persistent resource
      *
      * @param string $fileName
+     * @param bool $withoutPersistenceEnabled
      * @return PersistentResource|null
      */
-    public function persistentResource(string $fileName): ?PersistentResource
+    public function persistentResource(string $fileName, bool $withoutPersistenceEnabled = false): ?PersistentResource
     {
         if (substr($fileName, 0, 11) !== 'resource://') {
             $fileName = $this->options['fixturePath'] . $fileName;
         }
 
-        if ($this->options['persistenceEnabled'] === true) {
+        if ($this->options['persistenceEnabled'] === true || $withoutPersistenceEnabled === true) {
             return $this->resourceManager->importResource($fileName);
         } else {
             return null;
