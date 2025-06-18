@@ -7,6 +7,7 @@ use Faker\Generator;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\ResourceManagement\PersistentResource;
 use Neos\Flow\ResourceManagement\ResourceManager;
+use Neos\Media\Domain\Model\Asset;
 use Neos\Media\Domain\Model\Document;
 use Neos\Media\Domain\Model\Image;
 
@@ -15,6 +16,10 @@ use Neos\Media\Domain\Model\Image;
  */
 class ResourceFakerProvider implements FakerProviderInterface
 {
+
+
+    /** @var array<string, Asset> */
+    protected array $firstLevelAssetCache = [];
 
     /**
      * @var array{fixturePath: string, persistenceEnabled: bool}
@@ -60,6 +65,10 @@ class ResourceFakerProvider implements FakerProviderInterface
      */
     public function persistentResourceDocument(string $fileName): ?Document
     {
+        if (array_key_exists($fileName, $this->firstLevelAssetCache) && $this->firstLevelAssetCache[$fileName] instanceof Document) {
+            return $this->firstLevelAssetCache[$fileName];
+        }
+
         if ($resource = $this->persistentResource($fileName)) {
             $image = new Document($resource);
             $image->setTitle($fileName);
@@ -78,6 +87,10 @@ class ResourceFakerProvider implements FakerProviderInterface
      */
     public function persistentResourceImage(string $fileName): ?Image
     {
+        if (array_key_exists($fileName, $this->firstLevelAssetCache) && $this->firstLevelAssetCache[$fileName] instanceof Image) {
+            return $this->firstLevelAssetCache[$fileName];
+        }
+
         if ($resource = $this->persistentResource($fileName)) {
             $image = new Image($resource);
             $image->setTitle($fileName);
